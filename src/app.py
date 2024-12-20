@@ -40,7 +40,6 @@ class AnimalClassifierApp:
             efficientnet_path = os.path.join("checkpoints", "efficientnet", "efficientnet_best_model.pth")
             if os.path.exists(efficientnet_path):
                 checkpoint = torch.load(efficientnet_path, map_location=self.device, weights_only=True)
-                # Handle different state dict keys
                 state_dict = checkpoint.get('model_state_dict', checkpoint)
                 efficientnet.load_state_dict(state_dict, strict=False)
                 efficientnet.eval()
@@ -55,7 +54,6 @@ class AnimalClassifierApp:
             cnn_path = os.path.join("checkpoints", "cnn", "cnn_best_model.pth")
             if os.path.exists(cnn_path):
                 checkpoint = torch.load(cnn_path, map_location=self.device, weights_only=True)
-                # Handle different state dict keys
                 state_dict = checkpoint.get('model_state_dict', checkpoint)
                 cnn.load_state_dict(state_dict, strict=False)
                 cnn.eval()
@@ -122,18 +120,9 @@ class AnimalClassifierApp:
                 text_results += f"  {label}: {prob:.2%}\n"
             text_results += "\n"
         
-        # Create confidence comparison table
-        confidence_df = {
-            "Class": self.labels,
-            "EfficientNet": [f"{p:.2%}" for p in probabilities.get('EfficientNet', [0]*len(self.labels))],
-            "CNN": [f"{p:.2%}" for p in probabilities.get('CNN', [0]*len(self.labels))]
-        }
-        
         return [
-            image,         # Original image
             fig,           # Probability plots
-            text_results,  # Detailed text results
-            confidence_df  # Confidence comparison table
+            text_results   # Detailed text results
         ]
 
     def create_interface(self):
@@ -142,24 +131,12 @@ class AnimalClassifierApp:
             fn=self.predict,
             inputs=gr.Image(type="pil"),
             outputs=[
-                gr.Image(type="pil", label="Input Image"),
                 gr.Plot(label="Prediction Probabilities"),
-                gr.Textbox(label="Detailed Results", lines=10),
-                gr.Dataframe(label="Confidence Comparison")
+                gr.Textbox(label="Detailed Results", lines=10)
             ],
             title="Animal Classifier - Model Comparison",
-            description=(
-                "Upload an image of an animal to see predictions from both EfficientNet and CNN models. "
-                "The visualization shows probability distributions for each class from both models."
-            ),
-            examples=[
-                ["examples/bird.jpg"],
-                ["examples/cat.jpg"],
-                ["examples/dog.jpg"],
-                ["examples/horse.jpg"]
-            ]
+            description="Upload an image of an animal to see predictions from both EfficientNet and CNN models."
         )
-
 
 def main():
     """Run the web application."""
@@ -170,7 +147,6 @@ def main():
         server_port=7860,
         share=True
     )
-
 
 if __name__ == "__main__":
     main()
