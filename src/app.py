@@ -135,7 +135,11 @@ class AnimalClassifierApp:
                 gr.Textbox(label="Detailed Results", lines=10)
             ],
             title="Animal Classifier - Model Comparison",
-            description="Upload an image of an animal to see predictions from both EfficientNet and CNN models."
+            description=(
+                "Upload an image of one of these animals: Bird, Cat, Dog, or Horse.\n"
+                "The app will compare predictions from both EfficientNet and CNN models.\n\n"
+                "Note: For best results, ensure the animal is clearly visible in the image."
+            )
         )
 
 def main():
