@@ -194,9 +194,13 @@ def train_model(model_name, model, train_loader, val_loader, test_loader, config
     """Train a specific model."""
     logger.info(f"Training {model_name}...")
     
-    # Update save directory for this model
     model_config = config.copy()
     model_config['save_dir'] = os.path.join(config['save_dir'], model_name)
+    model_config['epochs'] = config['epochs'][model_name]  # Model specific epoch count
+    
+    # Adjust learning rate for CNN
+    if model_name == 'cnn':
+        model_config['learning_rate'] = 1e-3  # CNN lr higher
     
     # trainer sınıfı
     trainer = Trainer(
@@ -207,7 +211,6 @@ def train_model(model_name, model, train_loader, val_loader, test_loader, config
         config=model_config
     )
     
-    # Train and return results
     return trainer.train(model_name)
 
 
@@ -221,7 +224,10 @@ def main():
         'batch_size': 32,
         'learning_rate': 1e-4,
         'weight_decay': 1e-2,
-        'epochs': 10,
+        'epochs': {
+            'efficientnet': 8,  
+            'cnn': 8            
+        },
         'num_classes': 4,
         'save_dir': 'checkpoints'
     }
